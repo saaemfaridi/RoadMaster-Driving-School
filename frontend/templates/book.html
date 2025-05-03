@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RoadMaster - Book a Lesson</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+</head>
+<body>
+    <header class="bg-dark text-white py-3">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1>RoadMaster</h1>
+                <nav>
+                    <ul class="nav">
+                        <li class="nav-item"><a href="/" class="nav-link text-white">Home</a></li>
+                        <li class="nav-item"><a href="/dashboard" class="nav-link text-white">Dashboard</a></li>
+                        <li class="nav-item"><a href="/book" class="nav-link text-white active">Book a Lesson</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container my-5">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h2 class="mb-0 text-center">Book Your Driving Lesson</h2>
+                    </div>
+                    <div class="card-body p-4">
+                        <!-- Alert for success or error messages -->
+                        {% if message %}
+                        <div class="alert alert-{{ message_type }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endif %}
+
+                        <form id="bookingForm" action="/book" method="POST" class="needs-validation" novalidate>
+                            <!-- Personal Information -->
+                            <h4 class="mb-3">Personal Information</h4>
+                            <div class="row mb-3">
+                                <div class="col-md-6 mb-3">
+                                    <label for="name" class="form-label">Full Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="name" name="name" required minlength="3" 
+                                           value="{{ request.form.name or request.args.get('name', '') }}">
+                                    <div class="invalid-feedback">
+                                        Please enter your full name (at least 3 characters).
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="phone" class="form-label">Phone Number <span class="text-danger">*</span></label>
+                                    <input type="tel" class="form-control" id="phone" name="phone" required pattern="^\+?[0-9]{10,15}$"
+                                           value="{{ request.form.phone or request.args.get('phone', '') }}">
+                                    <div class="invalid-feedback">
+                                        Please enter a valid phone number (10-15 digits, may include + prefix).
+                                    </div>
+                                    <small class="form-text text-muted">Example: +12345678901 or 1234567890</small>
+                                </div>
+                            </div>
+
+                            <!-- Lesson Details -->
+                            <h4 class="mb-3">Lesson Details</h4>
+                            <div class="row mb-3">
+                                <div class="col-md-6 mb-3">
+                                    <label for="lesson_type" class="form-label">Lesson Type <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="lesson_type" name="lesson_type" required>
+                                        <option value="" disabled selected>Select a lesson type</option>
+                                        <option value="Standard" {% if (request.form.lesson_type == 'Standard') or (request.args.get('type') == 'standard') %}selected{% endif %}>Standard Lesson</option>
+                                        <option value="Advanced" {% if (request.form.lesson_type == 'Advanced') or (request.args.get('type') == 'advanced') %}selected{% endif %}>Advanced Lesson</option>
+                                        <option value="Premium" {% if (request.form.lesson_type == 'Premium') or (request.args.get('type') == 'premium') %}selected{% endif %}>Premium Package</option>
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        Please select a lesson type.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Date and Time -->
+                            <h4 class="mb-3">Select Date and Time</h4>
+                            <div class="row mb-4">
+                                <div class="col-md-6 mb-3">
+                                    <label for="slot_date" class="form-label">Date <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control" id="slot_date" name="slot_date" required
+                                           value="{{ request.form.slot_date or '' }}" min="{{ today_date }}">
+                                    <div class="invalid-feedback">
+                                        Please select a valid future date.
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="slot_time" class="form-label">Time <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="slot_time" name="slot_time" required>
+                                        <option value="" disabled selected>Select a time</option>
+                                        <option value="09:00" {% if request.form.slot_time == '09:00' %}selected{% endif %}>9:00 AM</option>
+                                        <option value="10:00" {% if request.form.slot_time == '10:00' %}selected{% endif %}>10:00 AM</option>
+                                        <option value="11:00" {% if request.form.slot_time == '11:00' %}selected{% endif %}>11:00 AM</option>
+                                        <option value="12:00" {% if request.form.slot_time == '12:00' %}selected{% endif %}>12:00 PM</option>
+                                        <option value="13:00" {% if request.form.slot_time == '13:00' %}selected{% endif %}>1:00 PM</option>
+                                        <option value="14:00" {% if request.form.slot_time == '14:00' %}selected{% endif %}>2:00 PM</option>
+                                        <option value="15:00" {% if request.form.slot_time == '15:00' %}selected{% endif %}>3:00 PM</option>
+                                        <option value="16:00" {% if request.form.slot_time == '16:00' %}selected{% endif %}>4:00 PM</option>
+                                        <option value="17:00" {% if request.form.slot_time == '17:00' %}selected{% endif %}>5:00 PM</option>
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        Please select a time slot.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Terms and Conditions -->
+                            <div class="mb-4 form-check">
+                                <input type="checkbox" class="form-check-input" id="terms" required>
+                                <label class="form-check-label" for="terms">
+                                    I agree to the <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">terms and conditions</a>
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <div class="invalid-feedback">
+                                    You must agree to the terms and conditions.
+                                </div>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary btn-lg">Book Now</button>
+                                <a href="/" class="btn btn-outline-secondary">Cancel</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Terms and Conditions Modal -->
+    <div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="termsModalLabel">Terms and Conditions</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h6>Booking Terms</h6>
+                    <p>By booking a lesson with RoadMaster Driving School, you agree to the following terms:</p>
+                    <ul>
+                        <li>24-hour cancellation policy: Cancellations must be made at least 24 hours in advance or the full lesson fee will apply.</li>
+                        <li>Arrive on time: Please be ready 10 minutes before your scheduled lesson time.</li>
+                        <li>Valid ID: You must present a valid ID before your first lesson.</li>
+                        <li>Payment: Payment is due at the time of the lesson.</li>
+                    </ul>
+                    
+                    <h6>Privacy Policy</h6>
+                    <p>We collect and process your personal information for the purpose of providing driving instruction services. Your data will be securely stored and will not be shared with third parties except as required for service delivery.</p>
+                    
+                    <h6>Rescheduling</h6>
+                    <p>To reschedule a booking, please contact us at least 24 hours before your scheduled lesson time.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">I Understand</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <h5>RoadMaster Driving School</h5>
+                    <p class="mb-0">123 Main Street</p>
+                    <p class="mb-0">Cityville, State 12345</p>
+                    <p class="mb-0">Phone: (123) 456-7890</p>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="/" class="text-white">Home</a></li>
+                        <li><a href="/book" class="text-white">Book a Lesson</a></li>
+                        <li><a href="/dashboard" class="text-white">Dashboard</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h5>Connect With Us</h5>
+                    <div class="d-flex">
+                        <a href="#" class="text-white me-3"><i class="fab fa-facebook-f fa-lg"></i></a>
+                        <a href="#" class="text-white me-3"><i class="fab fa-twitter fa-lg"></i></a>
+                        <a href="#" class="text-white me-3"><i class="fab fa-instagram fa-lg"></i></a>
+                        <a href="#" class="text-white"><i class="fab fa-linkedin-in fa-lg"></i></a>
+                    </div>
+                </div>
+            </div>
+            <hr class="my-3">
+            <div class="text-center">
+                <p class="mb-0">&copy; 2023 RoadMaster Driving School. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        // Client-side form validation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set minimum date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('slot_date').setAttribute('min', today);
+
+            // Form validation
+            const form = document.getElementById('bookingForm');
+            
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                
+                form.classList.add('was-validated');
+            });
+            
+            // Phone number validation
+            const phoneInput = document.getElementById('phone');
+            phoneInput.addEventListener('input', function() {
+                const phonePattern = /^\+?[0-9]{10,15}$/;
+                const isValid = phonePattern.test(phoneInput.value);
+                
+                if (isValid) {
+                    phoneInput.setCustomValidity('');
+                } else {
+                    phoneInput.setCustomValidity('Please enter a valid phone number');
+                }
+            });
+            
+            // Date validation 
+            const dateInput = document.getElementById('slot_date');
+            dateInput.addEventListener('change', function() {
+                const selectedDate = new Date(dateInput.value);
+                const currentDate = new Date();
+                
+                // Clear the time portion for comparison
+                currentDate.setHours(0, 0, 0, 0);
+                
+                if (selectedDate < currentDate) {
+                    dateInput.setCustomValidity('Please select a future date');
+                } else {
+                    dateInput.setCustomValidity('');
+                }
+            });
+            
+            // Auto-fill the lesson type if provided in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const lessonType = urlParams.get('type');
+            
+            if (lessonType) {
+                // Capitalize first letter for matching option value
+                const formattedType = lessonType.charAt(0).toUpperCase() + lessonType.slice(1);
+                const selectElement = document.getElementById('lesson_type');
+                
+                for (let i = 0; i < selectElement.options.length; i++) {
+                    if (selectElement.options[i].value === formattedType) {
+                        selectElement.selectedIndex = i;
+                        break;
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html> 

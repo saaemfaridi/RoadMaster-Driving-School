@@ -1,0 +1,15 @@
+Flask==2.3.3
+APScheduler==3.10.4
+SQLAlchemy==2.0.23
+Flask-SQLAlchemy==3.1.1
+Twilio==8.9.1
+openai==1.2.4
+streamlit==1.28.0
+python-dotenv==1.0.0
+Werkzeug==2.3.7
+Jinja2==3.1.2
+MarkupSafe==2.1.3
+itsdangerous==2.1.2
+click==8.1.7
+requests==2.31.0
+gunicorn==21.2.0 

@@ -1,0 +1,190 @@
+# ROADMASTER PROJECT OVERVIEW
+
+## WHAT THE PROJECT DOES
+
+RoadMaster is a Flask-based web application for managing a driving school's bookings and operations. It features:
+
+1. BOOKING SYSTEM
+   - Web form interface (/book) for users to book driving lessons
+   - Form validation for user inputs (name, phone, lesson type, date/time)
+   - SQLite database storage of booking information
+   - Confirmation messages after successful booking
+
+2. API FUNCTIONALITY
+   - RESTful API endpoints for CRUD operations
+   - /api/bookings - List, create, update, delete bookings
+   - /api/status - Check system status
+   - /api/booking - Special endpoint for Streamlit integration
+
+3. NOTIFICATIONS
+   - WhatsApp notifications using Twilio API
+   - SMS fallback if WhatsApp fails
+   - Customized booking confirmation messages
+   - Phone number formatting and validation
+
+4. STREAMLIT INTERFACE
+   - Alternative interface for creating bookings
+   - Communicates with Flask backend via API
+   - User-friendly form with date/time picker
+   - Shows booking confirmation details
+
+5. WEB INTERFACE
+   - Home page with service information
+   - Booking form with validation
+   - Dashboard for viewing bookings (basic implementation)
+   - Bootstrap styling for responsive design
+
+## TECHNOLOGIES USED
+
+1. BACKEND
+   - Flask (Python web framework)
+   - SQLAlchemy (ORM for database operations)
+   - APScheduler (Background task scheduling)
+   - Werkzeug (WSGI utility library)
+   - Jinja2 (Templating engine)
+
+2. DATABASE
+   - SQLite (File-based database)
+   - SQLAlchemy models and queries
+   - Data validation before storage
+
+3. FRONTEND
+   - HTML/CSS with Bootstrap
+   - Jinja2 templates
+   - Form validation (both client and server-side)
+   - Date and time pickers
+
+4. INTEGRATION
+   - Twilio API for WhatsApp/SMS
+   - Streamlit for additional UI
+   - RESTful API for integrations
+
+5. UTILITIES
+   - python-dotenv for environment variables
+   - logging for tracking errors
+   - datetime for date/time handling
+
+## PROJECT STRUCTURE
+
+1. MAIN COMPONENTS
+   - app.py - Main Flask application entry point
+   - config.py - Configuration settings
+   - streamlit_booking.py - Streamlit interface
+   - view_bookings.py - Simple booking viewer
+
+2. DIRECTORIES
+   - frontend/ - Templates and static assets
+   - backend/ - Models and routes
+   - automations/ - WhatsApp/SMS notification system
+   - database/ - Database storage
+   - docs/ - Documentation files
+
+3. KEY FILES
+   - backend/models.py - Database models (Booking class)
+   - backend/routes.py - API routes and endpoints
+   - automations/confirmation.py - WhatsApp/SMS sender
+   - frontend/templates/ - HTML templates
+
+## KNOWN LIMITATIONS AND BUGS
+
+1. AUTHENTICATION
+   - No user authentication system implemented
+   - Dashboard accessible without login
+   - No admin vs. regular user differentiation
+
+2. TWILIO INTEGRATION
+   - Requires Twilio credentials to work properly
+   - WhatsApp sandbox limitations (requires user opt-in)
+   - Error handling for Twilio API calls could be improved
+
+3. DATA VALIDATION
+   - Basic validation implemented but could be enhanced
+   - No CSRF protection on forms
+   - No rate limiting to prevent booking spam
+
+4. UI/UX ISSUES
+   - Basic styling implemented but needs refinement
+   - No confirmation email option for users
+   - Limited error feedback on forms
+
+5. DASHBOARD
+   - Very basic dashboard implementation
+   - No search, filter, or sorting capabilities
+   - No visual calendar view of bookings
+
+6. TIME ZONES
+   - No explicit time zone handling
+   - All dates stored in system's default time zone
+   - Could cause issues with international use
+
+7. DEPLOYMENT
+   - Set up for development, not production
+   - Debug mode enabled
+   - No proper security hardening
+
+8. DATABASE
+   - Using SQLite, not ideal for production/concurrency
+   - No database migrations set up
+   - No backup system implemented
+
+## FUTURE ENHANCEMENTS
+
+1. USER MANAGEMENT
+   - Add authentication system (login/logout)
+   - User roles (admin, staff, customers)
+   - User profiles with history
+
+2. ADVANCED BOOKING
+   - Recurring bookings
+   - Package bookings (multiple lessons)
+   - Instructor selection
+   - Location selection
+
+3. PAYMENT INTEGRATION
+   - Payment processing (Stripe, PayPal)
+   - Invoicing system
+   - Refund processing
+
+4. ENHANCED NOTIFICATIONS
+   - Email notifications
+   - Reminders before booking
+   - Booking change notifications
+
+5. ADMIN DASHBOARD
+   - Comprehensive booking management
+   - Revenue tracking
+   - Calendar view
+   - Analytics and reporting
+
+6. MOBILE APP
+   - Native mobile experience
+   - Push notifications
+   - Offline capability
+
+## HOW TO RUN THE PROJECT
+
+1. Start the Flask app:
+   ```
+   python app.py
+   ```
+   - Access at http://127.0.0.1:5000
+
+2. Start the Streamlit interface:
+   ```
+   streamlit run streamlit_booking.py
+   ```
+   - Access at http://localhost:8501
+
+3. Configuration:
+   - For WhatsApp/SMS functionality, set up Twilio credentials in .env file
+   - SECRET_KEY should be set in .env for production
+
+## DATABASE SCHEMA
+
+The main database table is "bookings" with the following columns:
+- id (Integer): Primary key
+- name (String): Customer's name
+- phone (String): Customer's phone number
+- lesson_type (String): Type of driving lesson
+- slot_datetime (DateTime): Scheduled date and time
+- created_at (DateTime): When the booking was created 

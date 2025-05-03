@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RoadMaster - Book a Lesson</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <header class="bg-dark text-white py-3">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1>RoadMaster</h1>
+                <nav>
+                    <ul class="nav">
+                        <li class="nav-item"><a href="/" class="nav-link text-white">Home</a></li>
+                        <li class="nav-item"><a href="/dashboard" class="nav-link text-white">Dashboard</a></li>
+                        <li class="nav-item"><a href="/book" class="nav-link text-white">Book a Lesson</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container my-5">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h2 class="mb-0">Book a Driving Lesson</h2>
+                    </div>
+                    <div class="card-body">
+                        {% if message %}
+                        <div class="alert alert-{{ message_type }}">
+                            {{ message }}
+                        </div>
+                        {% endif %}
+                        
+                        <form id="bookingForm" method="POST" action="/book">
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Full Name</label>
+                                <input type="text" class="form-control" id="name" name="name" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="phone" class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" 
+                                       placeholder="+1234567890" required>
+                                <div class="form-text">
+                                    Include country code (e.g., +1 for US). For WhatsApp notifications, 
+                                    make sure this is a WhatsApp-enabled number.
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="lesson_type" class="form-label">Lesson Type</label>
+                                <select class="form-select" id="lesson_type" name="lesson_type" required>
+                                    <option value="" disabled selected>Select a lesson type</option>
+                                    <option value="Beginner Driving Lesson">Beginner Driving Lesson</option>
+                                    <option value="Standard Driving Lesson">Standard Driving Lesson</option>
+                                    <option value="Advanced Driving Lesson">Advanced Driving Lesson</option>
+                                    <option value="Highway Driving Lesson">Highway Driving Lesson</option>
+                                    <option value="Parking Skills Lesson">Parking Skills Lesson</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="slot_date" class="form-label">Date</label>
+                                <input type="date" class="form-control" id="slot_date" name="slot_date" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="slot_time" class="form-label">Time</label>
+                                <input type="time" class="form-control" id="slot_time" name="slot_time" required>
+                            </div>
+                            
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary btn-lg">Book Now</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-light py-3 mt-5">
+        <div class="container text-center">
+            <p>&copy; 2023 RoadMaster. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    
+    <script>
+        // Client-side validation
+        document.getElementById('bookingForm').addEventListener('submit', function(event) {
+            const phone = document.getElementById('phone').value;
+            const phonePattern = /^\+?[0-9]{10,15}$/;
+            
+            if (!phonePattern.test(phone)) {
+                alert('Please enter a valid phone number (10-15 digits, optionally starting with +)');
+                event.preventDefault();
+            }
+            
+            const slotDate = document.getElementById('slot_date').value;
+            const today = new Date().toISOString().split('T')[0];
+            
+            if (slotDate < today) {
+                alert('Please select a future date for your lesson');
+                event.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html> 
